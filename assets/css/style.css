@@ -1,0 +1,62 @@
+/* Base Styles for EcoSprout Dark Theme */
+:root {
+    --bg-color: #0A140F; 
+    --card-bg: #122118; 
+    --card-border: #1E3829;
+    --primary-green: #1F8A4C; 
+    --primary-green-hover: #156E3B;
+    --text-primary: #FFFFFF;
+    --text-secondary: #90A499;
+    --accent: #E3A72F;
+    --success: #18794E;
+    --error: #B42318;
+    --font-main: system-ui, -apple-system, sans-serif;
+}
+
+body { font-family: var(--font-main); background-color: var(--bg-color); color: var(--text-primary); margin: 0; padding: 0; font-size: 14px; line-height: 1.6; }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+/* Header */
+.public-header { background-color: rgba(10, 20, 15, 0.95); border-bottom: 1px solid var(--card-border); padding: 15px 0; position: sticky; top: 0; z-index: 100; }
+.header-container { display: flex; justify-content: space-between; align-items: center; }
+.logo { display: flex; align-items: center; gap: 10px; font-size: 1.4rem; font-weight: 600; color: white; text-decoration: none; }
+.logo-icon { color: var(--primary-green); }
+.main-nav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 30px; }
+.main-nav a { text-decoration: none; color: var(--text-secondary); font-weight: 500; font-size: 0.9rem; transition: color 0.3s; }
+.main-nav a:hover, .main-nav a.active { color: white; }
+.header-icons { display: flex; gap: 20px; color: var(--text-secondary); align-items: center; }
+.header-icons span, .header-icons a { cursor: pointer; color: var(--text-secondary); text-decoration: none; }
+.header-icons span:hover, .header-icons a:hover { color: white; }
+.header-icons .cart { position: relative; }
+.cart-badge { position: absolute; top: -8px; right: -10px; background: var(--primary-green); color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 10px; }
+
+/* Mobile Menu Toggle */
+.mobile-menu-btn { display: none; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+
+/* Footer */
+.public-footer { border-top: 1px solid var(--card-border); padding: 40px 0 20px; margin-top: 60px; font-size: 0.8rem; color: var(--text-secondary); background: var(--card-bg); }
+.footer-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; margin-bottom: 30px; }
+.footer-col h4 { color: white; margin-bottom: 15px; font-size: 1rem; }
+.footer-col ul { list-style: none; padding: 0; margin: 0; }
+.footer-col ul li { margin-bottom: 8px; }
+.footer-col a { color: var(--text-secondary); text-decoration: none; }
+.footer-col a:hover { color: var(--primary-green); }
+.footer-bottom { border-top: 1px solid var(--card-border); padding-top: 20px; display: flex; justify-content: space-between; }
+
+/* Utilities */
+.text-green { color: var(--primary-green); }
+.text-white { color: white; }
+.text-secondary { color: var(--text-secondary); }
+.text-error { color: var(--error); font-size: 0.8rem; margin-top: 5px; display: block; }
+.flex { display: flex; }
+.flex-column { display: flex; flex-direction: column; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.align-center { align-items: center; }
+.gap-10 { gap: 10px; } .gap-20 { gap: 20px; }
+.mt-10 { margin-top: 10px; } .mt-20 { margin-top: 20px; } .mt-40 { margin-top: 40px; }
+.mb-10 { margin-bottom: 10px; } .mb-20 { margin-bottom: 20px; } .mb-40 { margin-bottom: 40px; }
+.font-weight-bold { font-weight: bold; }
+.font-size-sm { font-size: 0.85rem; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
