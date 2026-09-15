@@ -151,6 +151,11 @@ if ($cart !== []) {
                         Cart total:
                         LKR <?= number_format($cartTotal, 2) ?>
                     </h2>
+                    <p class="mt-20">
+    <a href="checkout.php" class="btn btn-primary">
+        Continue to checkout
+    </a>
+</p>
                 </div>
             </form>
 
