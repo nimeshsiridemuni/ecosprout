@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/includes/bootstrap.php';
 
+$flash = get_flash();
+
 $plantQuery = $pdo->query(
     'SELECT
         p.plant_id,
@@ -16,11 +18,13 @@ $plantQuery = $pdo->query(
      FROM plants AS p
      INNER JOIN categories AS c
         ON c.category_id = p.category_id
-     WHERE p.plant_status = "Active"
+     WHERE p.plant_status = \'Active\'
      ORDER BY p.plant_name'
 );
 
 $plants = $plantQuery->fetchAll();
+
+$cartQuantity = array_sum($_SESSION['cart'] ?? []);
 ?>
 
 <!DOCTYPE html>
@@ -62,7 +66,7 @@ $plants = $plantQuery->fetchAll();
             <button
                 class="mobile-menu-btn"
                 aria-expanded="false"
-                aria-label="Menu"
+                aria-label="Open navigation menu"
             >
                 ☰
             </button>
@@ -100,7 +104,7 @@ $plants = $plantQuery->fetchAll();
             <div class="header-icons">
                 <?php if (is_logged_in()): ?>
                     <a href="customer/dashboard.php">
-                        👤
+                        Account
                     </a>
                 <?php else: ?>
                     <a href="login.php">
@@ -108,16 +112,25 @@ $plants = $plantQuery->fetchAll();
                     </a>
                 <?php endif; ?>
 
-                <span class="cart">
+                <a href="cart.php" class="cart">
                     🛒
-                    <span class="cart-badge">0</span>
-                </span>
+
+                    <span class="cart-badge">
+                        <?= $cartQuantity ?>
+                    </span>
+                </a>
             </div>
         </div>
     </header>
 
     <main>
         <div class="container mt-40">
+            <?php if ($flash !== null): ?>
+                <div class="<?= escape($flash['type']) ?>">
+                    <?= escape($flash['message']) ?>
+                </div>
+            <?php endif; ?>
+
             <div class="flex justify-between align-center mb-20">
                 <div>
                     <h1>Plant Catalogue</h1>
@@ -144,6 +157,13 @@ $plants = $plantQuery->fetchAll();
             <?php else: ?>
                 <section class="grid-4">
                     <?php foreach ($plants as $plant): ?>
+                        <?php
+                        $stockQuantity =
+                            (int) $plant['stock_quantity'];
+
+                        $isInStock = $stockQuantity > 0;
+                        ?>
+
                         <article class="card card-interactive">
                             <div
                                 style="
@@ -163,12 +183,20 @@ $plants = $plantQuery->fetchAll();
                             <div
                                 class="flex justify-between align-center mb-10"
                             >
-                                <span class="badge badge-green">
-                                    In Stock
-                                </span>
+                                <?php if ($isInStock): ?>
+                                    <span class="badge badge-green">
+                                        In Stock
+                                    </span>
+                                <?php else: ?>
+                                    <span class="badge badge-gold">
+                                        Out of Stock
+                                    </span>
+                                <?php endif; ?>
 
                                 <span class="text-secondary font-size-sm">
-                                    <?= escape($plant['category_name']) ?>
+                                    <?= escape(
+                                        $plant['category_name']
+                                    ) ?>
                                 </span>
                             </div>
 
@@ -176,7 +204,9 @@ $plants = $plantQuery->fetchAll();
                                 <?= escape($plant['plant_name']) ?>
                             </h2>
 
-                            <?php if ($plant['scientific_name'] !== null): ?>
+                            <?php if (
+                                !empty($plant['scientific_name'])
+                            ): ?>
                                 <p
                                     class="text-secondary font-size-sm"
                                     style="font-style: italic;"
@@ -189,27 +219,55 @@ $plants = $plantQuery->fetchAll();
 
                             <p>
                                 Stock:
-                                <?= (int) $plant['stock_quantity'] ?>
+                                <?= $stockQuantity ?>
                             </p>
 
-                            <div
-                                class="flex justify-between align-center mt-20"
-                            >
-                                <strong class="text-green">
-                                    LKR
-                                    <?= number_format(
-                                        (float) $plant['price'],
-                                        2
-                                    ) ?>
-                                </strong>
+                            <strong class="text-green">
+                                LKR
+                                <?= number_format(
+                                    (float) $plant['price'],
+                                    2
+                                ) ?>
+                            </strong>
 
+                            <div class="mt-20">
                                 <a
-                                    class="btn btn-primary"
+                                    class="btn btn-outline"
                                     href="plant-details.php?id=<?= (int) $plant['plant_id'] ?>"
                                 >
-                                    View
+                                    View details
                                 </a>
                             </div>
+
+                            <form
+                                action="actions/add-to-cart.php"
+                                method="post"
+                                class="mt-20"
+                            >
+                                <?= csrf_field() ?>
+
+                                <input
+                                    type="hidden"
+                                    name="plant_id"
+                                    value="<?= (int) $plant['plant_id'] ?>"
+                                >
+
+                                <input
+                                    type="hidden"
+                                    name="quantity"
+                                    value="1"
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-primary"
+                                    <?= !$isInStock
+                                        ? 'disabled'
+                                        : '' ?>
+                                >
+                                    Add to cart
+                                </button>
+                            </form>
                         </article>
                     <?php endforeach; ?>
                 </section>
@@ -235,10 +293,21 @@ $plants = $plantQuery->fetchAll();
                 <h4>Quick Links</h4>
 
                 <ul>
-                    <li><a href="index.php">Home</a></li>
-                    <li><a href="plants.php">Plants</a></li>
-                    <li><a href="services.html">Services</a></li>
-                    <li><a href="workshops.html">Workshops</a></li>
+                    <li>
+                        <a href="index.php">Home</a>
+                    </li>
+
+                    <li>
+                        <a href="plants.php">Plants</a>
+                    </li>
+
+                    <li>
+                        <a href="services.html">Services</a>
+                    </li>
+
+                    <li>
+                        <a href="workshops.html">Workshops</a>
+                    </li>
                 </ul>
             </div>
 
@@ -257,7 +326,9 @@ $plants = $plantQuery->fetchAll();
                 &copy; 2026 EcoSprout. All rights reserved.
             </div>
 
-            <div>Plants Make Life Better</div>
+            <div>
+                Plants Make Life Better
+            </div>
         </div>
     </footer>
 
