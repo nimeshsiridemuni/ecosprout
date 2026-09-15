@@ -171,4 +171,4 @@ set_flash(
     'Your EcoSprout account was created successfully.'
 );
 
-redirect('/uni/ecosprout/register.php');
+redirect('/uni/ecosprout/login.php');
