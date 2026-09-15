@@ -24,7 +24,7 @@ $serviceAddress = trim($_POST['service_address'] ?? '');
 $customerNotes = trim($_POST['customer_notes'] ?? '');
 
 $date = DateTime::createFromFormat(
-    'Y-m-d',
+    '!Y-m-d',
     $bookingDate
 );
 
@@ -32,7 +32,7 @@ $dateIsValid =
     $date !== false
     && $date->format('Y-m-d') === $bookingDate;
 
-$minimumDate = new DateTime('tomorrow');
+$minimumDate = new DateTime('tomorrow midnight');
 
 if (
     !$serviceId

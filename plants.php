@@ -6,8 +6,25 @@ require_once __DIR__ . '/includes/bootstrap.php';
 
 $flash = get_flash();
 
-$plantQuery = $pdo->query(
-    'SELECT
+$submittedSearch = $_GET['search'] ?? '';
+$search = is_string($submittedSearch)
+    ? substr(trim($submittedSearch), 0, 100)
+    : '';
+$categoryId = filter_input(
+    INPUT_GET,
+    'category',
+    FILTER_VALIDATE_INT
+);
+
+$categoryQuery = $pdo->query(
+    'SELECT category_id, category_name
+     FROM categories
+     ORDER BY category_name'
+);
+
+$categories = $categoryQuery->fetchAll();
+
+$sql = 'SELECT
         p.plant_id,
         p.plant_name,
         p.scientific_name,
@@ -18,9 +35,29 @@ $plantQuery = $pdo->query(
      FROM plants AS p
      INNER JOIN categories AS c
         ON c.category_id = p.category_id
-     WHERE p.plant_status = \'Active\'
-     ORDER BY p.plant_name'
-);
+     WHERE p.plant_status = \'Active\'';
+
+$parameters = [];
+
+if ($search !== '') {
+    $sql .= ' AND (
+        p.plant_name LIKE :search
+        OR p.scientific_name LIKE :search
+        OR c.category_name LIKE :search
+    )';
+
+    $parameters['search'] = '%' . $search . '%';
+}
+
+if ($categoryId) {
+    $sql .= ' AND p.category_id = :category_id';
+    $parameters['category_id'] = $categoryId;
+}
+
+$sql .= ' ORDER BY p.plant_name';
+
+$plantQuery = $pdo->prepare($sql);
+$plantQuery->execute($parameters);
 
 $plants = $plantQuery->fetchAll();
 
@@ -84,11 +121,11 @@ $cartQuantity = array_sum($_SESSION['cart'] ?? []);
                     </li>
 
                     <li>
-                        <a href="services.html">Services</a>
+                        <a href="services.php">Services</a>
                     </li>
 
                     <li>
-                        <a href="workshops.html">Workshops</a>
+                        <a href="workshops.php">Workshops</a>
                     </li>
 
                     <li>
@@ -96,14 +133,14 @@ $cartQuantity = array_sum($_SESSION['cart'] ?? []);
                     </li>
 
                     <li>
-                        <a href="contact.html">Contact</a>
+                        <a href="contact.php">Contact</a>
                     </li>
                 </ul>
             </nav>
 
             <div class="header-icons">
                 <?php if (is_logged_in()): ?>
-                    <a href="customer/dashboard.php">
+                    <a href="<?= dashboard_path() ?>">
                         Account
                     </a>
                 <?php else: ?>
@@ -130,6 +167,51 @@ $cartQuantity = array_sum($_SESSION['cart'] ?? []);
                     <?= escape($flash['message']) ?>
                 </div>
             <?php endif; ?>
+
+            <form method="get" action="plants.php" class="card mb-20">
+                <div class="flex gap-10 align-center">
+                    <label for="search">Search plants</label>
+
+                    <input
+                        id="search"
+                        name="search"
+                        type="search"
+                        class="form-control"
+                        value="<?= escape($search) ?>"
+                        placeholder="Plant or category name"
+                    >
+
+                    <label for="category">Category</label>
+
+                    <select
+                        id="category"
+                        name="category"
+                        class="form-control"
+                    >
+                        <option value="">All categories</option>
+
+                        <?php foreach ($categories as $category): ?>
+                            <option
+                                value="<?= (int) $category['category_id'] ?>"
+                                <?= (int) $categoryId ===
+                                    (int) $category['category_id']
+                                    ? 'selected'
+                                    : '' ?>
+                            >
+                                <?= escape($category['category_name']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+
+                    <button type="submit" class="btn btn-primary">
+                        Search
+                    </button>
+
+                    <a href="plants.php" class="btn btn-outline">
+                        Clear
+                    </a>
+                </div>
+            </form>
 
             <div class="flex justify-between align-center mb-20">
                 <div>
@@ -302,11 +384,11 @@ $cartQuantity = array_sum($_SESSION['cart'] ?? []);
                     </li>
 
                     <li>
-                        <a href="services.html">Services</a>
+                        <a href="services.php">Services</a>
                     </li>
 
                     <li>
-                        <a href="workshops.html">Workshops</a>
+                        <a href="workshops.php">Workshops</a>
                     </li>
                 </ul>
             </div>

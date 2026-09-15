@@ -75,13 +75,13 @@ $workshops = $workshopQuery->fetchAll();
                         </a>
                     </li>
 
-                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="contact.php">Contact</a></li>
                 </ul>
             </nav>
 
             <div class="header-icons">
                 <?php if (is_logged_in()): ?>
-                    <a href="customer/dashboard.php">
+                    <a href="<?= dashboard_path() ?>">
                         Account
                     </a>
                 <?php else: ?>

@@ -77,6 +77,15 @@ $flash = get_flash();
                     View workshops
                 </a>
             </article>
+
+            <article class="card">
+                <h2>My Inquiries</h2>
+                <p>Read responses from the nursery team.</p>
+
+                <a href="inquiries.php" class="btn btn-primary">
+                    View inquiries
+                </a>
+            </article>
         </section>
 
         <form action="../logout.php" method="post" class="mt-20">

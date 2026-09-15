@@ -61,6 +61,27 @@ require_role(['Staff', 'Administrator']);
             </article>
 
             <article class="card">
+                <h2>Service bookings</h2>
+                <a href="bookings.php" class="btn btn-primary">
+                    Manage bookings
+                </a>
+            </article>
+
+            <article class="card">
+                <h2>Services</h2>
+                <a href="services.php" class="btn btn-primary">
+                    Manage services
+                </a>
+            </article>
+
+            <article class="card">
+                <h2>Workshops</h2>
+                <a href="workshops.php" class="btn btn-primary">
+                    Manage workshops
+                </a>
+            </article>
+
+            <article class="card">
                 <h2>Public website</h2>
 
                 <a href="../index.php" class="btn btn-outline">

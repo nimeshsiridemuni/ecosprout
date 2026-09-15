@@ -34,3 +34,12 @@ function require_role(array $allowedRoles): void
         );
     }
 }
+
+function dashboard_path(): string
+{
+    return match ($_SESSION['role'] ?? 'Customer') {
+        'Administrator' => '/uni/ecosprout/admin/dashboard.php',
+        'Staff' => '/uni/ecosprout/staff/dashboard.php',
+        default => '/uni/ecosprout/customer/dashboard.php',
+    };
+}

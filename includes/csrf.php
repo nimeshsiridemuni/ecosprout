@@ -32,6 +32,8 @@ function verify_csrf(): void
         || $sessionToken === ''
         || !hash_equals($sessionToken, $submittedToken)
     ) {
+        http_response_code(403);
+
         exit(
             'Invalid form request. Please return and try again.'
         );

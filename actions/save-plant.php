@@ -53,13 +53,30 @@ if (
     !$categoryId
     || $plantName === ''
     || strlen($plantName) > 100
+    || $price === null
     || $price === false
     || $price < 0
+    || $stockQuantity === null
     || $stockQuantity === false
     || $stockQuantity < 0
     || !in_array($plantStatus, $allowedStatuses, true)
 ) {
     set_flash('error', 'Please enter valid plant information.');
+    redirect('/uni/ecosprout/staff/plants.php');
+}
+
+$categoryQuery = $pdo->prepare(
+    'SELECT category_id
+     FROM categories
+     WHERE category_id = :category_id'
+);
+
+$categoryQuery->execute([
+    'category_id' => $categoryId,
+]);
+
+if (!$categoryQuery->fetch()) {
+    set_flash('error', 'The selected category does not exist.');
     redirect('/uni/ecosprout/staff/plants.php');
 }
 

@@ -56,20 +56,7 @@ $flash = get_flash();
 
             <div class="header-icons">
                 <?php if (is_logged_in()): ?>
-                    <?php
-                    $dashboardPath = match (
-                        $_SESSION['role'] ?? 'Customer'
-                    ) {
-                        'Administrator' =>
-                            'admin/dashboard.php',
-                        'Staff' =>
-                            'staff/dashboard.php',
-                        default =>
-                            'customer/dashboard.php',
-                    };
-                    ?>
-
-                    <a href="<?= $dashboardPath ?>">Account</a>
+                    <a href="<?= dashboard_path() ?>">Account</a>
 
                     <form action="logout.php" method="post">
                         <?= csrf_field() ?>

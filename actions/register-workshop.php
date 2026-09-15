@@ -54,7 +54,6 @@ try {
          FROM workshop_registrations
          WHERE workshop_id = :workshop_id
            AND customer_id = :customer_id
-           AND registration_status <> \'Cancelled\'
          LIMIT 1'
     );
 

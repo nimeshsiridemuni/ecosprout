@@ -84,6 +84,36 @@ require_role(['Administrator']);
                     Manage inquiries
                 </a>
             </article>
+
+            <article class="card">
+                <h2>Service bookings</h2>
+                <a
+                    href="../staff/bookings.php"
+                    class="btn btn-primary"
+                >
+                    Manage bookings
+                </a>
+            </article>
+
+            <article class="card">
+                <h2>Services</h2>
+                <a
+                    href="../staff/services.php"
+                    class="btn btn-primary"
+                >
+                    Manage services
+                </a>
+            </article>
+
+            <article class="card">
+                <h2>Workshops</h2>
+                <a
+                    href="../staff/workshops.php"
+                    class="btn btn-primary"
+                >
+                    Manage workshops
+                </a>
+            </article>
         </section>
 
         <form action="../logout.php" method="post" class="mt-20">
