@@ -74,4 +74,12 @@ set_flash(
     'Welcome back, ' . $user['full_name'] . '!'
 );
 
-redirect('/uni/ecosprout/index.php');
+if ($user['role_name'] === 'Administrator') {
+    redirect('/uni/ecosprout/admin/dashboard.php');
+}
+
+if ($user['role_name'] === 'Staff') {
+    redirect('/uni/ecosprout/staff/dashboard.php');
+}
+
+redirect('/uni/ecosprout/customer/dashboard.php');

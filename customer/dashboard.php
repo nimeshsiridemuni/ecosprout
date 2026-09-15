@@ -1,0 +1,50 @@
+<?php
+
+declare(strict_types=1);
+
+require_once __DIR__ . '/../includes/bootstrap.php';
+
+require_role(['Customer']);
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Customer Dashboard | EcoSprout</title>
+</head>
+
+<body>
+    <main>
+        <h1>Customer Dashboard</h1>
+
+        <p>
+            Welcome,
+            <?= escape($_SESSION['full_name']) ?>
+        </p>
+
+        <p>You are logged in as a customer.</p>
+
+        <a href="/uni/ecosprout/index.php">
+            Return to homepage
+        </a>
+
+        <form
+            action="/uni/ecosprout/logout.php"
+            method="post"
+        >
+            <?= csrf_field() ?>
+
+            <button type="submit">
+                Logout
+            </button>
+        </form>
+    </main>
+</body>
+</html>
