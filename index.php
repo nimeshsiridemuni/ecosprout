@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/bootstrap.php';
 
 $databaseQuery = $pdo->query('SELECT DATABASE()');
 $databaseName = $databaseQuery->fetchColumn();
+
+$securityHelpersReady = strlen(csrf_token()) === 64;
 ?>
 
 <!DOCTYPE html>
@@ -27,12 +29,17 @@ $databaseName = $databaseQuery->fetchColumn();
 
         <p>
             PHP version:
-            <?= htmlspecialchars(PHP_VERSION) ?>
+            <?= escape(PHP_VERSION) ?>
         </p>
 
         <p>
             Connected database:
-            <?= htmlspecialchars((string) $databaseName) ?>
+            <?= escape((string) $databaseName) ?>
+        </p>
+
+        <p>
+            Security helpers:
+            <?= $securityHelpersReady ? 'Ready' : 'Not ready' ?>
         </p>
     </main>
 </body>
