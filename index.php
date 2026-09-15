@@ -87,6 +87,11 @@ $securityHelpersReady = strlen(csrf_token()) === 64;
                 </a>
             </p>
         <?php endif; ?>
+        <p>
+    <a href="/uni/ecosprout/plants.php">
+        Browse available plants
+    </a>
+</p>
     </main>
 </body>
 </html>
