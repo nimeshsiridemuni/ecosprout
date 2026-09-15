@@ -1,0 +1,13 @@
+# Local editor configuration
+.vscode/
+
+# Local database credentials
+.env
+config/local.php
+
+# Runtime and log files
+*.log
+
+# Uploaded files
+uploads/*
+!uploads/.gitkeep
