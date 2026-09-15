@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - EcoSprout</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+</head>
+<body>
+    <header class="public-header">
+        <div class="container header-container">
+            <a href="index.html" class="logo"><span class="logo-icon">🌿</span> EcoSprout</a>
+            <button class="mobile-menu-btn" aria-expanded="false" aria-label="Menu">☰</button>
+            <nav class="main-nav"><ul><li><a href="index.html" >Home</a></li><li><a href="plants.html" >Plants</a></li><li><a href="services.html" >Services</a></li><li><a href="workshops.html" >Workshops</a></li><li><a href="about.html" >About</a></li><li><a href="contact.html" >Contact</a></li></ul></nav>
+            <div class="header-icons">
+                <span>🔍</span>
+                <a href="customer/dashboard.html">👤</a>
+                <span class="cart">🛒 <span class="cart-badge">0</span></span>
+            </div>
+        </div>
+    </header>
+    <main>
+<div class="container mt-40 flex justify-center">
+    <div class="card" style="width: 100%; max-width: 400px;">
+        <h2 class="text-center mb-20">Welcome Back</h2>
+        <form id="login-form" method="post">
+            <div class="form-group"><label>Email</label><input type="email" id="email" name="email" class="form-control" required></div>
+            <div class="form-group">
+                <label>Password</label>
+                <div style="position:relative;">
+                    <input type="password" id="password" name="password" class="form-control" required>
+                    <span class="toggle-password" style="position:absolute; right:15px; top:12px; cursor:pointer;">👁️</span>
+                </div>
+            </div>
+            <div class="form-group flex justify-between align-center">
+                <div class="flex align-center gap-10"><input type="checkbox" name="remember_me" id="remember"><label style="margin:0;">Remember me</label></div>
+                <a href="#" class="text-green font-size-sm">Forgot Password?</a>
+            </div>
+            <button type="button" class="btn btn-primary mb-20" style="width: 100%;" onclick="window.location.href='customer/dashboard.html'">Login (Demo)</button>
+        </form>
+        <div style="border-top:1px solid var(--card-border); padding-top:20px; margin-top:20px;">
+            <p class="font-size-sm text-secondary text-center mb-10">Demo Access Links:</p>
+            <div class="flex flex-column gap-10">
+                <a href="customer/dashboard.html" class="btn btn-outline" style="font-size:0.8rem;">Customer Dashboard</a>
+                <a href="staff/dashboard.html" class="btn btn-outline" style="font-size:0.8rem;">Staff Dashboard</a>
+                <a href="admin/dashboard.html" class="btn btn-outline" style="font-size:0.8rem;">Admin Dashboard</a>
+            </div>
+        </div>
+    </div>
+</div>
+</main>
+    <footer class="public-footer">
+        <div class="container footer-container">
+            <div class="footer-col">
+                <a href="index.html" class="logo mb-20"><span class="logo-icon">🌿</span> EcoSprout</a>
+                <p>Your trusted nursery for plants and professional gardening services in Kegalle.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <ul><li><a href="index.html" >Home</a></li><li><a href="plants.html" >Plants</a></li><li><a href="services.html" >Services</a></li><li><a href="workshops.html" >Workshops</a></li><li><a href="about.html" >About</a></li><li><a href="contact.html" >Contact</a></li></ul>
+            </div>
+            <div class="footer-col">
+                <h4>Services</h4>
+                <ul><li><a href="services.html">Plant Care</a></li><li><a href="services.html">Landscaping</a></li><li><a href="workshops.html">Workshops</a></li></ul>
+            </div>
+            <div class="footer-col">
+                <h4>Contact Us</h4>
+                <ul class="text-secondary">
+                    <li>📍 123 Green Lane, Kegalle</li>
+                    <li>📞 +94 35 123 4567</li>
+                    <li>📧 info@ecosprout.lk</li>
+                </ul>
+            </div>
+        </div>
+        <div class="container footer-bottom">
+            <div>&copy; 2026 EcoSprout. All rights reserved.</div>
+            <div class="text-secondary">Plants Make Life Better</div>
+        </div>
+    </footer>
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/validation.js"></script>
+    <script src="assets/js/plants.js"></script>
+</body>
+</html>
