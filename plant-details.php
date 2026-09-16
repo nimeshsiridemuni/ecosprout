@@ -48,13 +48,11 @@ if (!$plant) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>
         <?= escape($plant['plant_name']) ?> | EcoSprout
@@ -75,6 +73,19 @@ if (!$plant) {
             <span class="badge badge-green">
                 <?= escape($plant['category_name']) ?>
             </span>
+
+            <?php if (!empty($plant['image_name'])): ?>
+                <img src="assets/images/plants/<?= escape(
+                    basename((string) $plant['image_name'])
+                ) ?>" alt="<?= escape($plant['plant_name']) ?>" style="
+                        display: block;
+                        width: 100%;
+                        max-height: 420px;
+                        object-fit: cover;
+                        border-radius: 8px;
+                        margin: 20px 0;
+                    ">
+            <?php endif; ?>
 
             <h1>
                 <?= escape($plant['plant_name']) ?>
@@ -117,4 +128,5 @@ if (!$plant) {
         </article>
     </main>
 </body>
+
 </html>

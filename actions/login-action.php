@@ -65,6 +65,7 @@ session_regenerate_id(true);
 
 $_SESSION['user_id'] = (int) $user['user_id'];
 $_SESSION['full_name'] = $user['full_name'];
+$_SESSION['email'] = $user['email'];
 $_SESSION['role'] = $user['role_name'];
 
 unset($_SESSION['old_login_email']);

@@ -31,6 +31,7 @@ $sql = 'SELECT
         p.price,
         p.stock_quantity,
         p.plant_status,
+        p.image_name,
         c.category_name
      FROM plants AS p
      INNER JOIN categories AS c
@@ -66,45 +67,30 @@ $cartQuantity = array_sum($_SESSION['cart'] ?? []);
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Plant Catalogue | EcoSprout</title>
 
-    <link
-        rel="stylesheet"
-        href="assets/css/style.css"
-    >
+    <link rel="stylesheet" href="assets/css/style.css">
 
-    <link
-        rel="stylesheet"
-        href="assets/css/components.css"
-    >
+    <link rel="stylesheet" href="assets/css/components.css">
 
-    <link
-        rel="stylesheet"
-        href="assets/css/responsive.css"
-    >
+    <link rel="stylesheet" href="assets/css/responsive.css">
 </head>
 
 <body>
     <header class="public-header">
         <div class="container header-container">
             <a href="index.php" class="logo">
-                <span class="logo-icon">🌿</span>
+                <img src="logo.jpeg" alt="EcoSprout logo" class="logo-image">
                 EcoSprout
             </a>
 
-            <button
-                class="mobile-menu-btn"
-                aria-expanded="false"
-                aria-label="Open navigation menu"
-            >
+            <button class="mobile-menu-btn" aria-expanded="false" aria-label="Open navigation menu">
                 ☰
             </button>
 
@@ -129,12 +115,16 @@ $cartQuantity = array_sum($_SESSION['cart'] ?? []);
                     </li>
 
                     <li>
-                        <a href="about.html">About</a>
+                        <a href="about.php">About</a>
                     </li>
 
                     <li>
                         <a href="contact.php">Contact</a>
                     </li>
+
+                    <?php if (($_SESSION['role'] ?? '') === 'Customer'): ?>
+                        <li><a href="customer/orders.php">My Orders</a></li>
+                    <?php endif; ?>
                 </ul>
             </nav>
 
@@ -148,6 +138,11 @@ $cartQuantity = array_sum($_SESSION['cart'] ?? []);
                         Login
                     </a>
                 <?php endif; ?>
+
+                <a href="plants.php#plant-search" class="search-button" aria-label="Search plants"
+                    title="Search plants">
+                    <span class="search-icon" aria-hidden="true"></span>
+                </a>
 
                 <a href="cart.php" class="cart">
                     🛒
@@ -168,36 +163,23 @@ $cartQuantity = array_sum($_SESSION['cart'] ?? []);
                 </div>
             <?php endif; ?>
 
-            <form method="get" action="plants.php" class="card mb-20">
+            <form id="plant-search" method="get" action="plants.php" class="card mb-20">
                 <div class="flex gap-10 align-center">
                     <label for="search">Search plants</label>
 
-                    <input
-                        id="search"
-                        name="search"
-                        type="search"
-                        class="form-control"
-                        value="<?= escape($search) ?>"
-                        placeholder="Plant or category name"
-                    >
+                    <input id="search" name="search" type="search" class="form-control" value="<?= escape($search) ?>"
+                        placeholder="Plant or category name">
 
                     <label for="category">Category</label>
 
-                    <select
-                        id="category"
-                        name="category"
-                        class="form-control"
-                    >
+                    <select id="category" name="category" class="form-control">
                         <option value="">All categories</option>
 
                         <?php foreach ($categories as $category): ?>
-                            <option
-                                value="<?= (int) $category['category_id'] ?>"
-                                <?= (int) $categoryId ===
-                                    (int) $category['category_id']
-                                    ? 'selected'
-                                    : '' ?>
-                            >
+                            <option value="<?= (int) $category['category_id'] ?>" <?= (int) $categoryId ===
+                                   (int) $category['category_id']
+                                   ? 'selected'
+                                   : '' ?>>
                                 <?= escape($category['category_name']) ?>
                             </option>
                         <?php endforeach; ?>
@@ -247,24 +229,32 @@ $cartQuantity = array_sum($_SESSION['cart'] ?? []);
                         ?>
 
                         <article class="card card-interactive">
-                            <div
-                                style="
-                                    height: 200px;
-                                    background: #ffffff;
-                                    border-radius: 8px;
-                                    margin-bottom: 15px;
-                                    display: flex;
-                                    justify-content: center;
-                                    align-items: center;
-                                    color: #122118;
-                                "
-                            >
-                                Plant Image
-                            </div>
+                            <?php if (!empty($plant['image_name'])): ?>
+                                <img src="assets/images/plants/<?= escape(
+                                    basename((string) $plant['image_name'])
+                                ) ?>" alt="<?= escape($plant['plant_name']) ?>" style="
+                                        width: 100%;
+                                        height: 200px;
+                                        object-fit: cover;
+                                        border-radius: 8px;
+                                        margin-bottom: 15px;
+                                    ">
+                            <?php else: ?>
+                                <div style="
+                                        height: 200px;
+                                        background: #ffffff;
+                                        border-radius: 8px;
+                                        margin-bottom: 15px;
+                                        display: flex;
+                                        justify-content: center;
+                                        align-items: center;
+                                        color: #122118;
+                                    ">
+                                    No image
+                                </div>
+                            <?php endif; ?>
 
-                            <div
-                                class="flex justify-between align-center mb-10"
-                            >
+                            <div class="flex justify-between align-center mb-10">
                                 <?php if ($isInStock): ?>
                                     <span class="badge badge-green">
                                         In Stock
@@ -289,10 +279,7 @@ $cartQuantity = array_sum($_SESSION['cart'] ?? []);
                             <?php if (
                                 !empty($plant['scientific_name'])
                             ): ?>
-                                <p
-                                    class="text-secondary font-size-sm"
-                                    style="font-style: italic;"
-                                >
+                                <p class="text-secondary font-size-sm" style="font-style: italic;">
                                     <?= escape(
                                         $plant['scientific_name']
                                     ) ?>
@@ -313,40 +300,21 @@ $cartQuantity = array_sum($_SESSION['cart'] ?? []);
                             </strong>
 
                             <div class="mt-20">
-                                <a
-                                    class="btn btn-outline"
-                                    href="plant-details.php?id=<?= (int) $plant['plant_id'] ?>"
-                                >
+                                <a class="btn btn-outline" href="plant-details.php?id=<?= (int) $plant['plant_id'] ?>">
                                     View details
                                 </a>
                             </div>
 
-                            <form
-                                action="actions/add-to-cart.php"
-                                method="post"
-                                class="mt-20"
-                            >
+                            <form action="actions/add-to-cart.php" method="post" class="mt-20">
                                 <?= csrf_field() ?>
 
-                                <input
-                                    type="hidden"
-                                    name="plant_id"
-                                    value="<?= (int) $plant['plant_id'] ?>"
-                                >
+                                <input type="hidden" name="plant_id" value="<?= (int) $plant['plant_id'] ?>">
 
-                                <input
-                                    type="hidden"
-                                    name="quantity"
-                                    value="1"
-                                >
+                                <input type="hidden" name="quantity" value="1">
 
-                                <button
-                                    type="submit"
-                                    class="btn btn-primary"
-                                    <?= !$isInStock
-                                        ? 'disabled'
-                                        : '' ?>
-                                >
+                                <button type="submit" class="btn btn-primary" <?= !$isInStock
+                                    ? 'disabled'
+                                    : '' ?>>
                                     Add to cart
                                 </button>
                             </form>
@@ -361,7 +329,7 @@ $cartQuantity = array_sum($_SESSION['cart'] ?? []);
         <div class="container footer-container">
             <div class="footer-col">
                 <a href="index.php" class="logo">
-                    <span class="logo-icon">🌿</span>
+                    <img src="logo.jpeg" alt="EcoSprout logo" class="logo-image">
                     EcoSprout
                 </a>
 
@@ -416,4 +384,5 @@ $cartQuantity = array_sum($_SESSION['cart'] ?? []);
 
     <script src="assets/js/main.js"></script>
 </body>
+
 </html>

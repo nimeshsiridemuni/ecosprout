@@ -9,13 +9,11 @@ $flash = get_flash();
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>EcoSprout Nursery | Kegalle</title>
 
@@ -28,15 +26,11 @@ $flash = get_flash();
     <header class="public-header">
         <div class="container header-container">
             <a href="index.php" class="logo">
-                <span class="logo-icon">🌿</span>
+                <img src="logo.jpeg" alt="EcoSprout logo" class="logo-image">
                 EcoSprout
             </a>
 
-            <button
-                class="mobile-menu-btn"
-                aria-expanded="false"
-                aria-label="Open navigation menu"
-            >
+            <button class="mobile-menu-btn" aria-expanded="false" aria-label="Open navigation menu">
                 ☰
             </button>
 
@@ -49,22 +43,25 @@ $flash = get_flash();
                     <li><a href="plants.php">Plants</a></li>
                     <li><a href="services.php">Services</a></li>
                     <li><a href="workshops.php">Workshops</a></li>
-                    <li><a href="about.html">About</a></li>
+                    <li><a href="about.php">About</a></li>
                     <li><a href="contact.php">Contact</a></li>
+
+                    <?php if (($_SESSION['role'] ?? '') === 'Customer'): ?>
+                        <li><a href="customer/orders.php">My Orders</a></li>
+                    <?php endif; ?>
                 </ul>
             </nav>
 
             <div class="header-icons">
                 <?php if (is_logged_in()): ?>
-                    <a href="<?= dashboard_path() ?>">Account</a>
+                    <a href="<?= dashboard_path() ?>">
+                        <?= escape($_SESSION['email'] ?? 'Account') ?>
+                    </a>
 
                     <form action="logout.php" method="post">
                         <?= csrf_field() ?>
 
-                        <button
-                            type="submit"
-                            class="btn btn-outline"
-                        >
+                        <button type="submit" class="btn btn-outline">
                             Logout
                         </button>
                     </form>
@@ -75,6 +72,11 @@ $flash = get_flash();
                         Register
                     </a>
                 <?php endif; ?>
+
+                <a href="plants.php#plant-search" class="search-button" aria-label="Search plants"
+                    title="Search plants">
+                    <span class="search-icon" aria-hidden="true"></span>
+                </a>
 
                 <a href="cart.php">
                     🛒
@@ -93,88 +95,102 @@ $flash = get_flash();
             </div>
         <?php endif; ?>
 
-        <section class="container mt-40">
-            <div class="card">
-                <p class="text-green">
-                    EcoSprout Nursery — Kegalle
-                </p>
-
-                <h1>
-                    Grow healthier plants with local nursery
-                    support
-                </h1>
-
-                <p class="text-secondary">
-                    Shop nursery plants, book gardening services,
-                    join practical workshops and ask our team for
-                    plant-care advice.
-                </p>
-
-                <div class="flex gap-10 mt-20">
-                    <a href="plants.php" class="btn btn-primary">
-                        Browse plants
-                    </a>
-
-                    <a href="services.php" class="btn btn-outline">
-                        View services
-                    </a>
+        <section class="home-hero">
+            <div class="container hero-content">
+                <p class="eyebrow">EcoSprout Nursery · Kegalle</p>
+                <h1>Bring a little more life home.</h1>
+                <p class="hero-copy">Plants for brighter rooms, healthier gardens and slower weekends. Find the right
+                    fit, then grow with support from our local nursery team.</p>
+                <div class="flex gap-10 hero-actions">
+                    <a href="plants.php" class="btn btn-primary">Explore the nursery</a>
+                    <a href="contact.php" class="btn btn-light">Ask a plant question</a>
                 </div>
+                <div class="hero-meta"><span>10+ plant varieties</span><span>Local Kegalle delivery</span><span>Care
+                        advice included</span></div>
             </div>
         </section>
 
-        <section class="container mt-40">
-            <h2>What EcoSprout provides</h2>
-
-            <div class="grid-4">
-                <article class="card">
-                    <h3>Nursery plants</h3>
-                    <p>
-                        Browse indoor, outdoor, herbal and
-                        flowering plants.
-                    </p>
-                </article>
-
-                <article class="card">
-                    <h3>Gardening services</h3>
-                    <p>
-                        Book professional assistance for your
-                        home or business.
-                    </p>
-                </article>
-
-                <article class="card">
-                    <h3>Workshops</h3>
-                    <p>
-                        Learn practical plant-care techniques
-                        from experienced staff.
-                    </p>
-                </article>
-
-                <article class="card">
-                    <h3>Plant-care support</h3>
-                    <p>
-                        Send an inquiry and receive help from
-                        the nursery team.
-                    </p>
-                </article>
+        <section class="container page-section intro-section">
+            <div>
+                <p class="eyebrow">A better way to grow</p>
+                <h2>Good plants. Clear advice. No guesswork.</h2>
             </div>
+            <p class="section-lead">Choose from plants we know will thrive in your space, book practical help when you
+                need it, and learn how to keep every new leaf looking its best.</p>
+        </section>
+
+        <section class="container home-feature-grid">
+            <a href="plants.php" class="feature-card feature-card-large">
+                <img src="plant1.png" alt="Plants in the EcoSprout catalogue" class="feature-card-image">
+                <div class="feature-card-content">
+                    <span class="feature-index">01 / Catalogue</span>
+                    <h3>Find your next green companion.</h3>
+                    <p>Indoor, outdoor, flowering, herbal and low-maintenance favourites.</p>
+                    <span class="feature-arrow">Explore plants &#8594;</span>
+                </div>
+            </a>
+            <a href="services.php" class="feature-card">
+                <img src="plant2.png" alt="Plant care and gardening services" class="feature-card-image">
+                <div class="feature-card-content">
+                    <span class="feature-index">02 / Services</span>
+                    <h3>Make your garden feel intentional.</h3>
+                    <p>From repotting to full garden styling.</p>
+                    <span class="feature-arrow">View services &#8594;</span>
+                </div>
+            </a>
+            <a href="workshops.php" class="feature-card feature-card-accent">
+                <img src="plant3.png" alt="Plants for EcoSprout workshops" class="feature-card-image">
+                <div class="feature-card-content">
+                    <span class="feature-index">03 / Workshops</span>
+                    <h3>Learn what your plants are saying.</h3>
+                    <p>Practical sessions for confident care.</p>
+                    <span class="feature-arrow">See workshops &#8594;</span>
+                </div>
+            </a>
+        </section>
+
+        <section class="container page-section home-quote">
+            <p class="quote-mark">&#8220;</p>
+            <blockquote>Every plant has a place where it can flourish. We help you find it.</blockquote>
+            <a href="about.php" class="text-link">More about EcoSprout &#8594;</a>
         </section>
     </main>
 
-    <footer class="public-footer mt-40">
+    <footer class="public-footer">
         <div class="container footer-container">
-            <div>
-                <h3>EcoSprout</h3>
-                <p>Kegalle, Sri Lanka</p>
+            <div class="footer-brand">
+                <a href="index.php" class="logo"><img src="logo.jpeg" alt="EcoSprout logo" class="logo-image">
+                    EcoSprout</a>
+                <p>Plants, practical care and greener spaces for Kegalle.</p>
+                <a href="contact.php" class="footer-cta">Start a conversation &#8594;</a>
             </div>
-
-            <div>
-                <p>info@ecosprout.lk</p>
-                <p>&copy; 2026 EcoSprout</p>
+            <div class="footer-col">
+                <h4>Explore</h4>
+                <ul>
+                    <li><a href="plants.php">Plant catalogue</a></li>
+                    <li><a href="services.php">Gardening services</a></li>
+                    <li><a href="workshops.php">Workshops</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>EcoSprout</h4>
+                <ul>
+                    <li><a href="about.php">Our story</a></li>
+                    <li><a href="contact.php">Contact team</a></li>
+                    <li><a href="login.php">Customer login</a></li>
+                </ul>
+            </div>
+            <div class="footer-col footer-contact">
+                <h4>Visit</h4>
+                <p>Kegalle, Sri Lanka</p><a href="mailto:info@ecosprout.lk">info@ecosprout.lk</a>
+                <p>+94 35 123 4567</p>
             </div>
         </div>
+        <div class="container footer-bottom"><span>&copy; 2026 EcoSprout Nursery</span><span>Grow well. Live
+                green.</span></div>
     </footer>
 
     <script src="assets/js/main.js"></script>
 </body>
+
 </html>

@@ -117,6 +117,8 @@ CREATE TABLE orders (
     order_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     customer_id INT UNSIGNED NOT NULL,
     order_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    customer_name VARCHAR(100) NOT NULL,
+    customer_phone VARCHAR(20) NOT NULL,
     delivery_address VARCHAR(255) NOT NULL,
     subtotal DECIMAL(10, 2) NOT NULL,
     delivery_fee DECIMAL(10, 2) NOT NULL DEFAULT 0,
@@ -272,7 +274,7 @@ CREATE TABLE payments (
     payment_method ENUM(
         'Cash on Delivery',
         'Bank Transfer',
-        'Card Simulation'
+        'Card Payment'
     ) NOT NULL,
     amount DECIMAL(10, 2) NOT NULL,
     payment_status ENUM(

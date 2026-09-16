@@ -15,17 +15,26 @@ verify_csrf();
 $deliveryAddress = trim(
     $_POST['delivery_address'] ?? ''
 );
+$customerName = trim($_POST['customer_name'] ?? '');
+$customerPhone = trim($_POST['customer_phone'] ?? '');
 
 $paymentMethod = $_POST['payment_method'] ?? '';
+$cardNumber = preg_replace('/\D+/', '', $_POST['card_number'] ?? '');
+$cardExpiry = trim($_POST['card_expiry'] ?? '');
+$cardCvv = preg_replace('/\D+/', '', $_POST['card_cvv'] ?? '');
 
 $allowedPaymentMethods = [
     'Cash on Delivery',
     'Bank Transfer',
-    'Card Simulation',
+    'Card Payment',
 ];
 
 if (
-    $deliveryAddress === ''
+    $customerName === ''
+    || strlen($customerName) > 100
+    || $customerPhone === ''
+    || strlen($customerPhone) > 20
+    || $deliveryAddress === ''
     || strlen($deliveryAddress) > 255
     || !in_array(
         $paymentMethod,
@@ -39,6 +48,37 @@ if (
     );
 
     redirect('/uni/ecosprout/checkout.php');
+}
+
+if ($paymentMethod === 'Card Payment') {
+    if (
+        strlen($cardNumber) < 13
+        || strlen($cardNumber) > 19
+        || !preg_match('/^(0[1-9]|1[0-2])\/\d{2}$/', $cardExpiry)
+        || !preg_match('/^\d{3,4}$/', $cardCvv)
+    ) {
+        set_flash('error', 'Please enter valid card payment details.');
+        redirect('/uni/ecosprout/checkout.php');
+    }
+
+    $digits = strrev($cardNumber);
+    $checksum = 0;
+
+    for ($index = 0; $index < strlen($digits); $index++) {
+        $digit = (int) $digits[$index];
+
+        if ($index % 2 === 1) {
+            $digit *= 2;
+            $digit = $digit > 9 ? $digit - 9 : $digit;
+        }
+
+        $checksum += $digit;
+    }
+
+    if ($checksum % 10 !== 0) {
+        set_flash('error', 'Please enter a valid card number.');
+        redirect('/uni/ecosprout/checkout.php');
+    }
 }
 
 $cart = $_SESSION['cart'] ?? [];
@@ -120,6 +160,8 @@ try {
     $orderQuery = $pdo->prepare(
         'INSERT INTO orders (
             customer_id,
+            customer_name,
+            customer_phone,
             delivery_address,
             subtotal,
             delivery_fee,
@@ -127,6 +169,8 @@ try {
             order_status
          ) VALUES (
             :customer_id,
+            :customer_name,
+            :customer_phone,
             :delivery_address,
             :subtotal,
             :delivery_fee,
@@ -137,6 +181,8 @@ try {
 
     $orderQuery->execute([
         'customer_id' => (int) $_SESSION['user_id'],
+        'customer_name' => $customerName,
+        'customer_phone' => $customerPhone,
         'delivery_address' => $deliveryAddress,
         'subtotal' => $subtotal,
         'delivery_fee' => $deliveryFee,
@@ -164,14 +210,14 @@ try {
     $stockQuery = $pdo->prepare(
         'UPDATE plants
          SET
-            stock_quantity = stock_quantity - :quantity,
+            stock_quantity = stock_quantity - :decrement_quantity,
             plant_status = CASE
-                WHEN stock_quantity - :quantity = 0
+                WHEN stock_quantity - :remaining_quantity = 0
                     THEN \'Out of Stock\'
                 ELSE plant_status
             END
          WHERE plant_id = :plant_id
-           AND stock_quantity >= :quantity'
+           AND stock_quantity >= :minimum_quantity'
     );
 
     foreach ($orderPlants as $plant) {
@@ -184,7 +230,9 @@ try {
         ]);
 
         $stockQuery->execute([
-            'quantity' => $plant['quantity'],
+            'decrement_quantity' => $plant['quantity'],
+            'remaining_quantity' => $plant['quantity'],
+            'minimum_quantity' => $plant['quantity'],
             'plant_id' => $plant['plant_id'],
         ]);
 
@@ -195,7 +243,7 @@ try {
         }
     }
 
-    $paymentStatus = $paymentMethod === 'Card Simulation'
+    $paymentStatus = $paymentMethod === 'Card Payment'
         ? 'Paid'
         : 'Pending';
 
@@ -255,8 +303,8 @@ try {
     set_flash(
         'error',
         $exception instanceof RuntimeException
-            ? $exception->getMessage()
-            : 'The order could not be placed. Please try again.'
+        ? $exception->getMessage()
+        : 'The order could not be placed. Please try again.'
     );
 
     redirect('/uni/ecosprout/checkout.php');

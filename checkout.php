@@ -47,17 +47,25 @@ foreach ($plants as $plant) {
 }
 
 $totalAmount = $subtotal + $deliveryFee;
+$customerQuery = $pdo->prepare(
+    'SELECT full_name, phone, address
+     FROM users
+     WHERE user_id = :user_id
+     LIMIT 1'
+);
+$customerQuery->execute([
+    'user_id' => (int) $_SESSION['user_id'],
+]);
+$customer = $customerQuery->fetch() ?: [];
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Checkout | EcoSprout</title>
 
@@ -123,24 +131,30 @@ $totalAmount = $subtotal + $deliveryFee;
         <section class="card">
             <h2>Delivery and payment</h2>
 
-            <form
-                action="actions/place-order.php"
-                method="post"
-            >
+            <form action="actions/place-order.php" method="post">
                 <?= csrf_field() ?>
+
+                <div class="form-group">
+                    <label for="customer_name">Full name</label>
+
+                    <input id="customer_name" name="customer_name" type="text" class="form-control" maxlength="100"
+                        value="<?= escape((string) ($customer['full_name'] ?? '')) ?>" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="customer_phone">Telephone number</label>
+
+                    <input id="customer_phone" name="customer_phone" type="tel" class="form-control" maxlength="20"
+                        value="<?= escape((string) ($customer['phone'] ?? '')) ?>" required>
+                </div>
 
                 <div class="form-group">
                     <label for="delivery_address">
                         Delivery address
                     </label>
 
-                    <textarea
-                        id="delivery_address"
-                        name="delivery_address"
-                        class="form-control"
-                        required
-                        maxlength="255"
-                    ></textarea>
+                    <textarea id="delivery_address" name="delivery_address" class="form-control" required
+                        maxlength="255"><?= escape((string) ($customer['address'] ?? '')) ?></textarea>
                 </div>
 
                 <div class="form-group">
@@ -148,12 +162,7 @@ $totalAmount = $subtotal + $deliveryFee;
                         Payment method
                     </label>
 
-                    <select
-                        id="payment_method"
-                        name="payment_method"
-                        class="form-control"
-                        required
-                    >
+                    <select id="payment_method" name="payment_method" class="form-control" required>
                         <option value="">
                             Select a method
                         </option>
@@ -166,15 +175,35 @@ $totalAmount = $subtotal + $deliveryFee;
                             Bank Transfer
                         </option>
 
-                        <option value="Card Simulation">
-                            Card Simulation
+                        <option value="Card Payment">
+                            Card Payment
                         </option>
                     </select>
                 </div>
 
+                <div class="form-group">
+                    <label for="card_number">Card number</label>
+                    <input id="card_number" name="card_number" type="text" class="form-control" inputmode="numeric"
+                        autocomplete="cc-number" maxlength="19" placeholder="1234 5678 9012 3456">
+                </div>
+
+                <div class="flex gap-10">
+                    <div class="form-group">
+                        <label for="card_expiry">Expiry (MM/YY)</label>
+                        <input id="card_expiry" name="card_expiry" type="text" class="form-control"
+                            autocomplete="cc-exp" maxlength="5" placeholder="MM/YY">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="card_cvv">CVV</label>
+                        <input id="card_cvv" name="card_cvv" type="password" class="form-control" inputmode="numeric"
+                            autocomplete="cc-csc" maxlength="4">
+                    </div>
+                </div>
+
                 <p class="text-secondary">
-                    Card payment is simulated. Do not enter real
-                    card information.
+                    Card details are used only to validate this payment and
+                    are not stored by EcoSprout.
                 </p>
 
                 <button type="submit" class="btn btn-primary">
@@ -184,4 +213,5 @@ $totalAmount = $subtotal + $deliveryFee;
         </section>
     </main>
 </body>
+
 </html>

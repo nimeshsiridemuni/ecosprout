@@ -23,13 +23,11 @@ $services = $serviceQuery->fetchAll();
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Gardening Services | EcoSprout</title>
 
@@ -42,7 +40,7 @@ $services = $serviceQuery->fetchAll();
     <header class="public-header">
         <div class="container header-container">
             <a href="index.php" class="logo">
-                <span class="logo-icon">🌿</span>
+                <img src="logo.jpeg" alt="EcoSprout logo" class="logo-image">
                 EcoSprout
             </a>
 
@@ -56,7 +54,12 @@ $services = $serviceQuery->fetchAll();
                         </a>
                     </li>
                     <li><a href="workshops.php">Workshops</a></li>
+                    <li><a href="about.php">About</a></li>
                     <li><a href="contact.php">Contact</a></li>
+
+                    <?php if (($_SESSION['role'] ?? '') === 'Customer'): ?>
+                        <li><a href="customer/orders.php">My Orders</a></li>
+                    <?php endif; ?>
                 </ul>
             </nav>
 
@@ -68,6 +71,11 @@ $services = $serviceQuery->fetchAll();
                 <?php else: ?>
                     <a href="login.php">Login</a>
                 <?php endif; ?>
+
+                <a href="plants.php#plant-search" class="search-button" aria-label="Search plants"
+                    title="Search plants">
+                    <span class="search-icon" aria-hidden="true"></span>
+                </a>
             </div>
         </div>
     </header>
@@ -122,76 +130,45 @@ $services = $serviceQuery->fetchAll();
                         </strong>
 
                         <?php if (is_logged_in()): ?>
-                            <form
-                                action="actions/book-service.php"
-                                method="post"
-                                class="mt-20"
-                            >
+                            <form action="actions/book-service.php" method="post" class="mt-20">
                                 <?= csrf_field() ?>
 
-                                <input
-                                    type="hidden"
-                                    name="service_id"
-                                    value="<?= (int) $service['service_id'] ?>"
-                                >
+                                <input type="hidden" name="service_id" value="<?= (int) $service['service_id'] ?>">
 
                                 <label for="date-<?= (int) $service['service_id'] ?>">
                                     Booking date
                                 </label>
 
-                                <input
-                                    id="date-<?= (int) $service['service_id'] ?>"
-                                    type="date"
-                                    name="booking_date"
-                                    min="<?= date('Y-m-d', strtotime('+1 day')) ?>"
-                                    required
-                                >
+                                <input id="date-<?= (int) $service['service_id'] ?>" type="date" name="booking_date"
+                                    min="<?= date('Y-m-d', strtotime('+1 day')) ?>" required>
 
                                 <label for="time-<?= (int) $service['service_id'] ?>">
                                     Booking time
                                 </label>
 
-                                <input
-                                    id="time-<?= (int) $service['service_id'] ?>"
-                                    type="time"
-                                    name="booking_time"
-                                    required
-                                >
+                                <input id="time-<?= (int) $service['service_id'] ?>" type="time" name="booking_time" required>
 
                                 <label for="address-<?= (int) $service['service_id'] ?>">
                                     Service address
                                 </label>
 
-                                <textarea
-                                    id="address-<?= (int) $service['service_id'] ?>"
-                                    name="service_address"
-                                    maxlength="255"
-                                    required
-                                ></textarea>
+                                <textarea id="address-<?= (int) $service['service_id'] ?>" name="service_address" maxlength="255"
+                                    required></textarea>
 
                                 <label for="notes-<?= (int) $service['service_id'] ?>">
                                     Additional notes
                                 </label>
 
-                                <textarea
-                                    id="notes-<?= (int) $service['service_id'] ?>"
-                                    name="customer_notes"
-                                    maxlength="1000"
-                                ></textarea>
+                                <textarea id="notes-<?= (int) $service['service_id'] ?>" name="customer_notes"
+                                    maxlength="1000"></textarea>
 
-                                <button
-                                    type="submit"
-                                    class="btn btn-primary"
-                                >
+                                <button type="submit" class="btn btn-primary">
                                     Book service
                                 </button>
                             </form>
                         <?php else: ?>
                             <p class="mt-20">
-                                <a
-                                    href="login.php"
-                                    class="btn btn-primary"
-                                >
+                                <a href="login.php" class="btn btn-primary">
                                     Log in to book
                                 </a>
                             </p>
@@ -204,4 +181,5 @@ $services = $serviceQuery->fetchAll();
 
     <script src="assets/js/main.js"></script>
 </body>
+
 </html>

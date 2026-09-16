@@ -40,13 +40,11 @@ $workshops = $workshopQuery->fetchAll();
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Workshops | EcoSprout</title>
 
@@ -59,7 +57,7 @@ $workshops = $workshopQuery->fetchAll();
     <header class="public-header">
         <div class="container header-container">
             <a href="index.php" class="logo">
-                <span class="logo-icon">🌿</span>
+                <img src="logo.jpeg" alt="EcoSprout logo" class="logo-image">
                 EcoSprout
             </a>
 
@@ -68,14 +66,18 @@ $workshops = $workshopQuery->fetchAll();
                     <li><a href="index.php">Home</a></li>
                     <li><a href="plants.php">Plants</a></li>
                     <li><a href="services.php">Services</a></li>
-
                     <li>
                         <a href="workshops.php" class="active">
                             Workshops
                         </a>
                     </li>
 
+                    <li><a href="about.php">About</a></li>
                     <li><a href="contact.php">Contact</a></li>
+
+                    <?php if (($_SESSION['role'] ?? '') === 'Customer'): ?>
+                        <li><a href="customer/orders.php">My Orders</a></li>
+                    <?php endif; ?>
                 </ul>
             </nav>
 
@@ -87,6 +89,11 @@ $workshops = $workshopQuery->fetchAll();
                 <?php else: ?>
                     <a href="login.php">Login</a>
                 <?php endif; ?>
+
+                <a href="plants.php#plant-search" class="search-button" aria-label="Search plants"
+                    title="Search plants">
+                    <span class="search-icon" aria-hidden="true"></span>
+                </a>
             </div>
         </div>
     </header>
@@ -166,30 +173,17 @@ $workshops = $workshopQuery->fetchAll();
                                 Workshop full
                             </span>
                         <?php elseif (is_logged_in()): ?>
-                            <form
-                                action="actions/register-workshop.php"
-                                method="post"
-                            >
+                            <form action="actions/register-workshop.php" method="post">
                                 <?= csrf_field() ?>
 
-                                <input
-                                    type="hidden"
-                                    name="workshop_id"
-                                    value="<?= (int) $workshop['workshop_id'] ?>"
-                                >
+                                <input type="hidden" name="workshop_id" value="<?= (int) $workshop['workshop_id'] ?>">
 
-                                <button
-                                    type="submit"
-                                    class="btn btn-primary"
-                                >
+                                <button type="submit" class="btn btn-primary">
                                     Register
                                 </button>
                             </form>
                         <?php else: ?>
-                            <a
-                                href="login.php"
-                                class="btn btn-primary"
-                            >
+                            <a href="login.php" class="btn btn-primary">
                                 Log in to register
                             </a>
                         <?php endif; ?>
@@ -201,4 +195,5 @@ $workshops = $workshopQuery->fetchAll();
 
     <script src="assets/js/main.js"></script>
 </body>
+
 </html>

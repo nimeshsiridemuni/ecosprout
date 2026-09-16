@@ -32,13 +32,11 @@ $orders = $orderQuery->fetchAll();
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>My Orders | EcoSprout</title>
 
@@ -56,9 +54,19 @@ $orders = $orderQuery->fetchAll();
         <h1>My Orders</h1>
 
         <?php if ($flash !== null): ?>
-            <div class="<?= escape($flash['type']) ?>">
+            <div class="<?= escape($flash['type']) ?>" role="status" style="font-size: 1.1rem; margin-bottom: 20px;">
                 <?= escape($flash['message']) ?>
             </div>
+        <?php endif; ?>
+
+        <?php if ($flash !== null && $flash['type'] === 'success'): ?>
+            <section class="card mb-20">
+                <h2>Purchase successful</h2>
+                <p>
+                    Thank you for your purchase. Your order has been
+                    received and is now being processed.
+                </p>
+            </section>
         <?php endif; ?>
 
         <?php if ($orders === []): ?>
@@ -106,4 +114,5 @@ $orders = $orderQuery->fetchAll();
         <?php endif; ?>
     </main>
 </body>
+
 </html>

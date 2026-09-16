@@ -28,7 +28,6 @@ $plantName = trim($_POST['plant_name'] ?? '');
 $scientificName = trim($_POST['scientific_name'] ?? '');
 $description = trim($_POST['description'] ?? '');
 $careInstructions = trim($_POST['care_instructions'] ?? '');
-$imageName = trim($_POST['image_name'] ?? '');
 $plantStatus = $_POST['plant_status'] ?? '';
 
 $price = filter_input(
@@ -82,6 +81,77 @@ if (!$categoryQuery->fetch()) {
 
 if ($stockQuantity === 0 && $plantStatus === 'Active') {
     $plantStatus = 'Out of Stock';
+}
+
+$imageName = null;
+
+if ($plantId) {
+    $currentImageQuery = $pdo->prepare(
+        'SELECT image_name
+         FROM plants
+         WHERE plant_id = :plant_id
+         LIMIT 1'
+    );
+
+    $currentImageQuery->execute([
+        'plant_id' => $plantId,
+    ]);
+
+    $imageName = $currentImageQuery->fetchColumn() ?: null;
+}
+
+if (
+    isset($_FILES['plant_image'])
+    && $_FILES['plant_image']['error'] !== UPLOAD_ERR_NO_FILE
+) {
+    $uploadedImage = $_FILES['plant_image'];
+
+    if ($uploadedImage['error'] !== UPLOAD_ERR_OK) {
+        set_flash('error', 'The plant image could not be uploaded.');
+        redirect('/uni/ecosprout/staff/plants.php');
+    }
+
+    if ($uploadedImage['size'] > 5 * 1024 * 1024) {
+        set_flash('error', 'Plant images must be 5 MB or smaller.');
+        redirect('/uni/ecosprout/staff/plants.php');
+    }
+
+    $imageInfo = getimagesize($uploadedImage['tmp_name']);
+    $extensionByMime = [
+        'image/jpeg' => 'jpg',
+        'image/png' => 'png',
+        'image/webp' => 'webp',
+    ];
+
+    if (
+        $imageInfo === false
+        || !isset($extensionByMime[$imageInfo['mime']])
+    ) {
+        set_flash(
+            'error',
+            'Only PNG, JPG and WEBP plant images are allowed.'
+        );
+        redirect('/uni/ecosprout/staff/plants.php');
+    }
+
+    $uploadDirectory = __DIR__ . '/../assets/images/plants';
+
+    if (!is_dir($uploadDirectory)) {
+        mkdir($uploadDirectory, 0755, true);
+    }
+
+    $imageName = 'plant-' . bin2hex(random_bytes(12)) . '.'
+        . $extensionByMime[$imageInfo['mime']];
+
+    if (
+        !move_uploaded_file(
+            $uploadedImage['tmp_name'],
+            $uploadDirectory . '/' . $imageName
+        )
+    ) {
+        set_flash('error', 'The plant image could not be saved.');
+        redirect('/uni/ecosprout/staff/plants.php');
+    }
 }
 
 $values = [
@@ -144,8 +214,8 @@ $saveQuery->execute($values);
 set_flash(
     'success',
     $plantId
-        ? 'Plant updated successfully.'
-        : 'Plant added successfully.'
+    ? 'Plant updated successfully.'
+    : 'Plant added successfully.'
 );
 
 redirect('/uni/ecosprout/staff/plants.php');
