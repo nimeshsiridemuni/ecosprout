@@ -42,12 +42,15 @@ $parameters = [];
 
 if ($search !== '') {
     $sql .= ' AND (
-        p.plant_name LIKE :search
-        OR p.scientific_name LIKE :search
-        OR c.category_name LIKE :search
+        p.plant_name LIKE :plant_name_search
+        OR p.scientific_name LIKE :scientific_name_search
+        OR c.category_name LIKE :category_name_search
     )';
 
-    $parameters['search'] = '%' . $search . '%';
+    $searchValue = '%' . $search . '%';
+    $parameters['plant_name_search'] = $searchValue;
+    $parameters['scientific_name_search'] = $searchValue;
+    $parameters['category_name_search'] = $searchValue;
 }
 
 if ($categoryId) {
