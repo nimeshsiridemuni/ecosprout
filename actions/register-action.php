@@ -66,6 +66,10 @@ if (strlen($password) < 8) {
     $errors[] = 'The password must contain at least eight characters.';
 }
 
+if (strlen($password) > 72) {
+    $errors[] = 'The password must not exceed 72 characters.';
+}
+
 if ($password !== $confirmPassword) {
     $errors[] = 'The passwords do not match.';
 }

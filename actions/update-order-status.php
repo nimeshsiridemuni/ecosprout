@@ -37,17 +37,99 @@ if (
     redirect('/uni/ecosprout/staff/orders.php');
 }
 
-$orderQuery = $pdo->prepare(
-    'UPDATE orders
-     SET order_status = :order_status
-     WHERE order_id = :order_id'
-);
+try {
+    $pdo->beginTransaction();
 
-$orderQuery->execute([
-    'order_status' => $orderStatus,
-    'order_id' => $orderId,
-]);
+    $currentOrderQuery = $pdo->prepare(
+        'SELECT order_status
+         FROM orders
+         WHERE order_id = :order_id
+         FOR UPDATE'
+    );
+    $currentOrderQuery->execute([
+        'order_id' => $orderId,
+    ]);
 
-set_flash('success', 'Order status updated successfully.');
+    $currentStatus = $currentOrderQuery->fetchColumn();
+
+    if ($currentStatus === false) {
+        throw new RuntimeException('The order could not be found.');
+    }
+
+    if ($currentStatus === 'Cancelled' && $orderStatus !== 'Cancelled') {
+        throw new RuntimeException(
+            'A cancelled order cannot be reopened because its stock was restored.'
+        );
+    }
+
+    if ($currentStatus !== 'Cancelled' && $orderStatus === 'Cancelled') {
+        $itemQuery = $pdo->prepare(
+            'SELECT plant_id, quantity
+             FROM order_items
+             WHERE order_id = :order_id'
+        );
+        $itemQuery->execute([
+            'order_id' => $orderId,
+        ]);
+
+        $restoreStockQuery = $pdo->prepare(
+            'UPDATE plants
+             SET
+                stock_quantity = stock_quantity + :quantity,
+                plant_status = CASE
+                    WHEN plant_status = \'Out of Stock\' THEN \'Active\'
+                    ELSE plant_status
+                END
+             WHERE plant_id = :plant_id'
+        );
+
+        foreach ($itemQuery->fetchAll() as $item) {
+            $restoreStockQuery->execute([
+                'quantity' => (int) $item['quantity'],
+                'plant_id' => (int) $item['plant_id'],
+            ]);
+        }
+
+        $paymentQuery = $pdo->prepare(
+            'UPDATE payments
+             SET payment_status = CASE
+                WHEN payment_status = \'Paid\' THEN \'Refunded\'
+                ELSE payment_status
+             END
+             WHERE order_id = :order_id'
+        );
+        $paymentQuery->execute([
+            'order_id' => $orderId,
+        ]);
+    }
+
+    $orderQuery = $pdo->prepare(
+        'UPDATE orders
+         SET order_status = :order_status
+         WHERE order_id = :order_id'
+    );
+    $orderQuery->execute([
+        'order_status' => $orderStatus,
+        'order_id' => $orderId,
+    ]);
+
+    $pdo->commit();
+    set_flash('success', 'Order status updated successfully.');
+} catch (Throwable $exception) {
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+
+    if (!$exception instanceof RuntimeException) {
+        error_log($exception->getMessage());
+    }
+
+    set_flash(
+        'error',
+        $exception instanceof RuntimeException
+            ? $exception->getMessage()
+            : 'The order status could not be updated.'
+    );
+}
 
 redirect('/uni/ecosprout/staff/orders.php');

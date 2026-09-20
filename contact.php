@@ -33,6 +33,10 @@ $customerEmail = $_SESSION['email'] ?? '';
                 EcoSprout
             </a>
 
+            <button class="mobile-menu-btn" aria-expanded="false" aria-label="Open navigation menu">
+                &#9776;
+            </button>
+
             <nav class="main-nav">
                 <ul>
                     <li><a href="index.php">Home</a></li>
@@ -165,6 +169,7 @@ $customerEmail = $_SESSION['email'] ?? '';
         <div class="container footer-bottom"><span>&copy; 2026 EcoSprout Nursery</span><span>Grow well. Live
                 green.</span></div>
     </footer>
+    <script src="assets/js/main.js"></script>
 </body>
 
 </html>

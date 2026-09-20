@@ -74,7 +74,13 @@ if (!$plant) {
                 <?= escape($plant['category_name']) ?>
             </span>
 
-            <?php if (!empty($plant['image_name'])): ?>
+            <?php if (
+                !empty($plant['image_name'])
+                && is_file(
+                    __DIR__ . '/assets/images/plants/'
+                    . basename((string) $plant['image_name'])
+                )
+            ): ?>
                 <img src="assets/images/plants/<?= escape(
                     basename((string) $plant['image_name'])
                 ) ?>" alt="<?= escape($plant['plant_name']) ?>" style="

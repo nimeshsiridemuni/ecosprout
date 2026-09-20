@@ -38,12 +38,46 @@ $plantQuery = $pdo->prepare(
 $plantQuery->execute($plantIds);
 $plants = $plantQuery->fetchAll();
 
+$availablePlantIds = array_map(
+    static fn (array $plant): int => (int) $plant['plant_id'],
+    $plants
+);
+$cartWasAdjusted = false;
+
+foreach ($cart as $plantId => $quantity) {
+    if (!in_array((int) $plantId, $availablePlantIds, true)) {
+        unset($_SESSION['cart'][$plantId]);
+        $cartWasAdjusted = true;
+    }
+}
+
 foreach ($plants as $plant) {
-    $quantity = (int) (
-        $cart[(int) $plant['plant_id']] ?? 0
-    );
+    $plantId = (int) $plant['plant_id'];
+    $quantity = (int) ($cart[$plantId] ?? 0);
+    $stockQuantity = (int) $plant['stock_quantity'];
+
+    if ($quantity < 1 || $stockQuantity < 1) {
+        unset($_SESSION['cart'][$plantId]);
+        $cartWasAdjusted = true;
+        continue;
+    }
+
+    if ($quantity > $stockQuantity) {
+        $_SESSION['cart'][$plantId] = $stockQuantity;
+        $cartWasAdjusted = true;
+    }
+
+    $quantity = min($quantity, $stockQuantity);
 
     $subtotal += (float) $plant['price'] * $quantity;
+}
+
+if ($cartWasAdjusted) {
+    set_flash(
+        'error',
+        'Your cart was updated because availability changed. Please review it.'
+    );
+    redirect('/uni/ecosprout/cart.php');
 }
 
 $totalAmount = $subtotal + $deliveryFee;
@@ -175,8 +209,8 @@ $customer = $customerQuery->fetch() ?: [];
                             Bank Transfer
                         </option>
 
-                        <option value="Card Payment">
-                            Card Payment
+                        <option value="Card Simulation">
+                            Card Payment (demo)
                         </option>
                     </select>
                 </div>
@@ -202,8 +236,8 @@ $customer = $customerQuery->fetch() ?: [];
                 </div>
 
                 <p class="text-secondary">
-                    Card details are used only to validate this payment and
-                    are not stored by EcoSprout.
+                    This is a classroom payment simulation. Use test card
+                    details only; EcoSprout does not store them.
                 </p>
 
                 <button type="submit" class="btn btn-primary">

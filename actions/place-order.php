@@ -16,7 +16,11 @@ $deliveryAddress = trim(
     $_POST['delivery_address'] ?? ''
 );
 $customerName = trim($_POST['customer_name'] ?? '');
-$customerPhone = trim($_POST['customer_phone'] ?? '');
+$customerPhone = str_replace(
+    [' ', '-', '(', ')'],
+    '',
+    trim($_POST['customer_phone'] ?? '')
+);
 
 $paymentMethod = $_POST['payment_method'] ?? '';
 $cardNumber = preg_replace('/\D+/', '', $_POST['card_number'] ?? '');
@@ -26,14 +30,13 @@ $cardCvv = preg_replace('/\D+/', '', $_POST['card_cvv'] ?? '');
 $allowedPaymentMethods = [
     'Cash on Delivery',
     'Bank Transfer',
-    'Card Payment',
+    'Card Simulation',
 ];
 
 if (
     $customerName === ''
     || strlen($customerName) > 100
-    || $customerPhone === ''
-    || strlen($customerPhone) > 20
+    || !preg_match('/^(?:\+94|0)\d{9}$/', $customerPhone)
     || $deliveryAddress === ''
     || strlen($deliveryAddress) > 255
     || !in_array(
@@ -50,11 +53,22 @@ if (
     redirect('/uni/ecosprout/checkout.php');
 }
 
-if ($paymentMethod === 'Card Payment') {
+if ($paymentMethod === 'Card Simulation') {
+    $expiryDate = DateTimeImmutable::createFromFormat(
+        '!m/y',
+        $cardExpiry
+    );
+    $currentMonth = new DateTimeImmutable(
+        'first day of this month midnight'
+    );
+
     if (
         strlen($cardNumber) < 13
         || strlen($cardNumber) > 19
         || !preg_match('/^(0[1-9]|1[0-2])\/\d{2}$/', $cardExpiry)
+        || $expiryDate === false
+        || $expiryDate->format('m/y') !== $cardExpiry
+        || $expiryDate < $currentMonth
         || !preg_match('/^\d{3,4}$/', $cardCvv)
     ) {
         set_flash('error', 'Please enter valid card payment details.');
@@ -157,11 +171,25 @@ try {
 
     $totalAmount = $subtotal + $deliveryFee;
 
+    $customerQuery = $pdo->prepare(
+        'UPDATE users
+         SET
+            full_name = :full_name,
+            phone = :phone,
+            address = :address
+         WHERE user_id = :user_id'
+    );
+
+    $customerQuery->execute([
+        'full_name' => $customerName,
+        'phone' => $customerPhone,
+        'address' => $deliveryAddress,
+        'user_id' => (int) $_SESSION['user_id'],
+    ]);
+
     $orderQuery = $pdo->prepare(
         'INSERT INTO orders (
             customer_id,
-            customer_name,
-            customer_phone,
             delivery_address,
             subtotal,
             delivery_fee,
@@ -169,8 +197,6 @@ try {
             order_status
          ) VALUES (
             :customer_id,
-            :customer_name,
-            :customer_phone,
             :delivery_address,
             :subtotal,
             :delivery_fee,
@@ -181,8 +207,6 @@ try {
 
     $orderQuery->execute([
         'customer_id' => (int) $_SESSION['user_id'],
-        'customer_name' => $customerName,
-        'customer_phone' => $customerPhone,
         'delivery_address' => $deliveryAddress,
         'subtotal' => $subtotal,
         'delivery_fee' => $deliveryFee,
@@ -243,7 +267,7 @@ try {
         }
     }
 
-    $paymentStatus = $paymentMethod === 'Card Payment'
+    $paymentStatus = $paymentMethod === 'Card Simulation'
         ? 'Paid'
         : 'Pending';
 
@@ -286,6 +310,7 @@ try {
     $pdo->commit();
 
     unset($_SESSION['cart']);
+    $_SESSION['full_name'] = $customerName;
 
     set_flash(
         'success',

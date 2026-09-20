@@ -1,0 +1,12 @@
+DirectoryIndex index.php index.html
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule (?:^|/)\. - [F,L]
+    RewriteRule ^(?:config|database|includes)(?:/|$) - [F,L,NC]
+</IfModule>
+
+<FilesMatch "\.(?:sql|md|log|ini)$">
+    Require all denied
+</FilesMatch>

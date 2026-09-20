@@ -61,6 +61,10 @@ $workshops = $workshopQuery->fetchAll();
                 EcoSprout
             </a>
 
+            <button class="mobile-menu-btn" aria-expanded="false" aria-label="Open navigation menu">
+                &#9776;
+            </button>
+
             <nav class="main-nav">
                 <ul>
                     <li><a href="index.php">Home</a></li>
@@ -172,7 +176,7 @@ $workshops = $workshopQuery->fetchAll();
                             <span class="badge badge-gold">
                                 Workshop full
                             </span>
-                        <?php elseif (is_logged_in()): ?>
+                        <?php elseif (($_SESSION['role'] ?? '') === 'Customer'): ?>
                             <form action="actions/register-workshop.php" method="post">
                                 <?= csrf_field() ?>
 
@@ -182,10 +186,14 @@ $workshops = $workshopQuery->fetchAll();
                                     Register
                                 </button>
                             </form>
-                        <?php else: ?>
+                        <?php elseif (!is_logged_in()): ?>
                             <a href="login.php" class="btn btn-primary">
                                 Log in to register
                             </a>
+                        <?php else: ?>
+                            <span class="text-secondary">
+                                Registration requires a customer account.
+                            </span>
                         <?php endif; ?>
                     </article>
                 <?php endforeach; ?>

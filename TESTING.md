@@ -29,3 +29,7 @@ assignment report. Do not mark a test as passed until it has been performed.
 | T22 | Admin changes another user | Role/status is updated | | Not tested |
 | T23 | Admin opens reports | Current database totals appear | | Not tested |
 | T24 | Test narrow mobile width | Pages remain readable and usable | | Not tested |
+| T25 | Checkout with the original normalized orders table | Order completes without a customer_name SQL error | | Not tested |
+| T26 | Open a cart after a plant is deactivated or stock falls | Unavailable items are removed or quantities are reduced | | Not tested |
+| T27 | Cancel a paid order once | Stock is restored and Paid changes to Refunded | | Not tested |
+| T28 | Attempt to reopen a cancelled order | Request is rejected so stock cannot be deducted incorrectly | | Not tested |

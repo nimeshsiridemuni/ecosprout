@@ -32,13 +32,18 @@ $dateIsValid =
     $date !== false
     && $date->format('Y-m-d') === $bookingDate;
 
+$time = DateTime::createFromFormat('!H:i', $bookingTime);
+$timeIsValid =
+    $time !== false
+    && $time->format('H:i') === $bookingTime;
+
 $minimumDate = new DateTime('tomorrow midnight');
 
 if (
     !$serviceId
     || !$dateIsValid
     || $date < $minimumDate
-    || !preg_match('/^\d{2}:\d{2}$/', $bookingTime)
+    || !$timeIsValid
     || $serviceAddress === ''
     || strlen($serviceAddress) > 255
     || strlen($customerNotes) > 1000

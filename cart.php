@@ -8,6 +8,7 @@ $flash = get_flash();
 $cart = $_SESSION['cart'] ?? [];
 $plants = [];
 $cartTotal = 0.0;
+$cartWasAdjusted = false;
 
 if ($cart !== []) {
     $plantIds = array_map(
@@ -33,6 +34,48 @@ if ($cart !== []) {
 
     $cartQuery->execute($plantIds);
     $plants = $cartQuery->fetchAll();
+
+    $availablePlantIds = array_map(
+        static fn (array $plant): int => (int) $plant['plant_id'],
+        $plants
+    );
+
+    foreach ($cart as $plantId => $quantity) {
+        if (!in_array((int) $plantId, $availablePlantIds, true)) {
+            unset($_SESSION['cart'][$plantId]);
+            unset($cart[$plantId]);
+            $cartWasAdjusted = true;
+        }
+    }
+
+    foreach ($plants as $index => $plant) {
+        $plantId = (int) $plant['plant_id'];
+        $stockQuantity = (int) $plant['stock_quantity'];
+        $quantity = (int) ($cart[$plantId] ?? 0);
+
+        if ($stockQuantity < 1 || $quantity < 1) {
+            unset($_SESSION['cart'][$plantId], $cart[$plantId]);
+            unset($plants[$index]);
+            $cartWasAdjusted = true;
+            continue;
+        }
+
+        if ($quantity > $stockQuantity) {
+            $_SESSION['cart'][$plantId] = $stockQuantity;
+            $cart[$plantId] = $stockQuantity;
+            $cartWasAdjusted = true;
+        }
+    }
+
+    $plants = array_values($plants);
+}
+
+if ($cartWasAdjusted && $flash === null) {
+    $flash = [
+        'type' => 'error',
+        'message' =>
+            'Your cart was adjusted to match the current stock.',
+    ];
 }
 ?>
 

@@ -86,13 +86,13 @@ unset($_SESSION['old_registration']);
                         <div class="form-group">
                             <label for="password">Password</label>
                             <input type="password" id="password" name="password" class="form-control" minlength="8"
-                                autocomplete="new-password" required>
+                                maxlength="72" autocomplete="new-password" required>
                             <small>At least eight characters.</small>
                         </div>
                         <div class="form-group">
                             <label for="confirm_password">Confirm password</label>
                             <input type="password" id="confirm_password" name="confirm_password" class="form-control"
-                                minlength="8" autocomplete="new-password" required>
+                                minlength="8" maxlength="72" autocomplete="new-password" required>
                         </div>
                     </div>
 

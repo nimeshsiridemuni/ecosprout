@@ -44,6 +44,10 @@ $services = $serviceQuery->fetchAll();
                 EcoSprout
             </a>
 
+            <button class="mobile-menu-btn" aria-expanded="false" aria-label="Open navigation menu">
+                &#9776;
+            </button>
+
             <nav class="main-nav">
                 <ul>
                     <li><a href="index.php">Home</a></li>
@@ -129,7 +133,7 @@ $services = $serviceQuery->fetchAll();
                             ) ?>
                         </strong>
 
-                        <?php if (is_logged_in()): ?>
+                        <?php if (($_SESSION['role'] ?? '') === 'Customer'): ?>
                             <form action="actions/book-service.php" method="post" class="mt-20">
                                 <?= csrf_field() ?>
 
@@ -166,11 +170,15 @@ $services = $serviceQuery->fetchAll();
                                     Book service
                                 </button>
                             </form>
-                        <?php else: ?>
+                        <?php elseif (!is_logged_in()): ?>
                             <p class="mt-20">
                                 <a href="login.php" class="btn btn-primary">
                                     Log in to book
                                 </a>
+                            </p>
+                        <?php else: ?>
+                            <p class="mt-20 text-secondary">
+                                Service bookings require a customer account.
                             </p>
                         <?php endif; ?>
                     </article>

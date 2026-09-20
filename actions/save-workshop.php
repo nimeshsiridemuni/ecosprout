@@ -20,11 +20,12 @@ $capacity = filter_input(INPUT_POST, 'capacity', FILTER_VALIDATE_INT);
 $fee = filter_input(INPUT_POST, 'registration_fee', FILTER_VALIDATE_FLOAT);
 $status = $_POST['workshop_status'] ?? '';
 $date = DateTime::createFromFormat('!Y-m-d', $workshopDate);
+$time = DateTime::createFromFormat('!H:i', $startTime);
 
 if (
     $title === '' || strlen($title) > 150
     || !$date || $date->format('Y-m-d') !== $workshopDate
-    || !preg_match('/^\d{2}:\d{2}$/', $startTime)
+    || !$time || $time->format('H:i') !== $startTime
     || $location === '' || strlen($location) > 200
     || $capacity === null || $capacity === false || $capacity < 1
     || $fee === null || $fee === false || $fee < 0
